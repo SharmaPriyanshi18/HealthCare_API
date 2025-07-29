@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthCare_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250716043051_SchedulerTherapist")]
-    partial class SchedulerTherapist
+    [Migration("20250728165956_initLoad")]
+    partial class initLoad
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -269,6 +269,9 @@ namespace HealthCare_API.Migrations
                     b.Property<int>("DiseaseCaseId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsEmailSent")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("dateFrom")
                         .HasColumnType("datetime2");
 
@@ -280,6 +283,37 @@ namespace HealthCare_API.Migrations
                     b.HasIndex("DiseaseCaseId");
 
                     b.ToTable("schedulers");
+                });
+
+            modelBuilder.Entity("HealthCare_Data.Identity.treatment", b =>
+                {
+                    b.Property<int>("treatmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("treatmentId"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TherapistId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("treatmentId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("TherapistId");
+
+                    b.ToTable("treatments");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -483,7 +517,7 @@ namespace HealthCare_API.Migrations
             modelBuilder.Entity("HealthCareData.Identity.SchedulerTherapist", b =>
                 {
                     b.HasOne("HealthCareData.Identity.schedulerDate", "Scheduler")
-                        .WithMany()
+                        .WithMany("SchedulerTherapists")
                         .HasForeignKey("SchedulerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -508,6 +542,25 @@ namespace HealthCare_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Disease");
+                });
+
+            modelBuilder.Entity("HealthCare_Data.Identity.treatment", b =>
+                {
+                    b.HasOne("HealthCareData.Identity.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthCareData.Identity.Therapist", "Therapist")
+                        .WithMany()
+                        .HasForeignKey("TherapistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Therapist");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -564,6 +617,11 @@ namespace HealthCare_API.Migrations
             modelBuilder.Entity("HealthCareData.Identity.Therapist", b =>
                 {
                     b.Navigation("Cases");
+                });
+
+            modelBuilder.Entity("HealthCareData.Identity.schedulerDate", b =>
+                {
+                    b.Navigation("SchedulerTherapists");
                 });
 #pragma warning restore 612, 618
         }

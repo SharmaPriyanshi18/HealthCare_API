@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HealthCare_Data.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,8 +14,11 @@ namespace HealthCareData.Identity
         public int schedulerId { get; set; }
         public DateTime dateFrom { get; set; }
         public DateTime dateTo { get; set; }
-        public int CaseId { get; set; }
-        public Disease Disease { get; set; }
+        //public int CaseId { get; set; }
+        //public Disease Disease { get; set; }
+
+        public int treatmentId { get; set; }
+        public treatment treatment { get; set; }
         public ICollection<SchedulerTherapist> SchedulerTherapists { get; set; }
         public bool IsEmailSent { get; set; } = false;
     }

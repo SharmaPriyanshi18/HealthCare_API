@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthCare_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250707071203_DiseaseModel")]
-    partial class DiseaseModel
+    [Migration("20250728185444_assessment")]
+    partial class assessment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,7 @@ namespace HealthCare_API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -172,6 +173,59 @@ namespace HealthCare_API.Migrations
                     b.ToTable("Diseases");
                 });
 
+            modelBuilder.Entity("HealthCareData.Identity.ImageProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("ImageProfiles");
+                });
+
+            modelBuilder.Entity("HealthCareData.Identity.SchedulerTherapist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("SchedulerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TherapistId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchedulerId");
+
+                    b.HasIndex("TherapistId");
+
+                    b.ToTable("schedulerTherapists");
+                });
+
             modelBuilder.Entity("HealthCareData.Identity.Therapist", b =>
                 {
                     b.Property<int>("TherapistId")
@@ -180,7 +234,15 @@ namespace HealthCare_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TherapistId"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -191,6 +253,85 @@ namespace HealthCare_API.Migrations
                     b.HasKey("TherapistId");
 
                     b.ToTable("Therapists");
+                });
+
+            modelBuilder.Entity("HealthCareData.Identity.schedulerDate", b =>
+                {
+                    b.Property<int>("schedulerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("schedulerId"));
+
+                    b.Property<bool>("IsEmailSent")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("dateFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("dateTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("treatmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("schedulerId");
+
+                    b.HasIndex("treatmentId");
+
+                    b.ToTable("schedulers");
+                });
+
+            modelBuilder.Entity("HealthCare_Data.Identity.Assessment", b =>
+                {
+                    b.Property<int>("AssessmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssessmentId"));
+
+                    b.Property<int>("schedulerDateschedulerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("schedulerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AssessmentId");
+
+                    b.HasIndex("schedulerDateschedulerId");
+
+                    b.ToTable("Assessments");
+                });
+
+            modelBuilder.Entity("HealthCare_Data.Identity.treatment", b =>
+                {
+                    b.Property<int>("treatmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("treatmentId"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TherapistId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("treatmentId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("TherapistId");
+
+                    b.ToTable("treatments");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -380,6 +521,77 @@ namespace HealthCare_API.Migrations
                     b.Navigation("Therapist");
                 });
 
+            modelBuilder.Entity("HealthCareData.Identity.ImageProfile", b =>
+                {
+                    b.HasOne("HealthCareData.Identity.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("HealthCareData.Identity.SchedulerTherapist", b =>
+                {
+                    b.HasOne("HealthCareData.Identity.schedulerDate", "Scheduler")
+                        .WithMany("SchedulerTherapists")
+                        .HasForeignKey("SchedulerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthCareData.Identity.Therapist", "Therapist")
+                        .WithMany()
+                        .HasForeignKey("TherapistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Scheduler");
+
+                    b.Navigation("Therapist");
+                });
+
+            modelBuilder.Entity("HealthCareData.Identity.schedulerDate", b =>
+                {
+                    b.HasOne("HealthCare_Data.Identity.treatment", "treatment")
+                        .WithMany()
+                        .HasForeignKey("treatmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("treatment");
+                });
+
+            modelBuilder.Entity("HealthCare_Data.Identity.Assessment", b =>
+                {
+                    b.HasOne("HealthCareData.Identity.schedulerDate", "schedulerDate")
+                        .WithMany()
+                        .HasForeignKey("schedulerDateschedulerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("schedulerDate");
+                });
+
+            modelBuilder.Entity("HealthCare_Data.Identity.treatment", b =>
+                {
+                    b.HasOne("HealthCareData.Identity.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthCareData.Identity.Therapist", "Therapist")
+                        .WithMany()
+                        .HasForeignKey("TherapistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Therapist");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -434,6 +646,11 @@ namespace HealthCare_API.Migrations
             modelBuilder.Entity("HealthCareData.Identity.Therapist", b =>
                 {
                     b.Navigation("Cases");
+                });
+
+            modelBuilder.Entity("HealthCareData.Identity.schedulerDate", b =>
+                {
+                    b.Navigation("SchedulerTherapists");
                 });
 #pragma warning restore 612, 618
         }

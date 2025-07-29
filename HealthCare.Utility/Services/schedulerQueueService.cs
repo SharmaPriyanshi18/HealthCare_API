@@ -1,4 +1,5 @@
-﻿using HealthCareData.Identity;
+﻿using HealthCare_Data.Identity;
+using HealthCareData.Identity;
 using HealthCareModels.Models.DTOs;
 using HealthCareRepositorys.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -64,7 +65,7 @@ namespace HealthCareRepositorys.Repository
                                     continue; 
                                 }
 
-                                var disease = new Disease
+                                var treat = new treatment
                                 {
                                     Title = dto.Title,
                                     DateCreated = DateTime.UtcNow,
@@ -72,15 +73,15 @@ namespace HealthCareRepositorys.Repository
                                     TherapistId = therapistId
                                 };
 
-                                await context.Diseases.AddAsync(disease);
+                                await context.treatments.AddAsync(treat);
                                 await context.SaveChangesAsync();
 
                                 var scheduler = new schedulerDate
                                 {
                                     dateFrom = dto.DateFrom,
                                     dateTo = dto.DateTo,
-                                    CaseId = disease.CaseId,
-                                    Disease = disease,
+                                    treatmentId = treat.treatmentId,
+                                    treatment = treat,
                                     IsEmailSent = false, 
                                     SchedulerTherapists = dto.TherapistIds.Select(id => new SchedulerTherapist
                                     {
@@ -91,7 +92,7 @@ namespace HealthCareRepositorys.Repository
                                 await schedulerRepo.CreateAsync(scheduler);
                                 await schedulerRepo.SaveAsync();
 
-                                Console.WriteLine($"✅ Scheduler created for CaseId: {disease.CaseId}");
+                                Console.WriteLine($"✅ Scheduler created for CaseId:{treat.treatmentId}");
                             }
                             catch (Exception ex)
                             {

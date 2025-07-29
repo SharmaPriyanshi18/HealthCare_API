@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using HealthCare_Data.Identity;
+using HealthCare_Models.DTOs;
 using HealthCareData.Identity;
 using HealthCareModels.Models.DTOs;
 using System;
@@ -19,6 +21,18 @@ namespace HealthCareModels.MappingProfile
                 .ForMember(dest => dest.ApplicationUserId, opt => opt.MapFrom(src => src.PatientId))
                 .ReverseMap();
             CreateMap<Disease, DiseaseDto>().ReverseMap();
+            CreateMap<treatment, treatmentDto>()
+                           .ForMember(dest => dest.TherapistName, opt => opt.MapFrom(src => src.Therapist.Name)) 
+                           .ReverseMap();
+            CreateMap<Assessment, AssessmentDto>()
+                       .ForMember(dest => dest.SchedulerId, opt => opt.MapFrom(src => src.schedulerId))
+                       .ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.schedulerDate.treatment.ApplicationUser.UserName))
+                       .ForMember(dest => dest.TherapistName, opt => opt.MapFrom(src => src.schedulerDate.treatment.Therapist.Name))
+                       .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.schedulerDate.treatment.ApplicationUser.UserName))
+                       .ForMember(dest => dest.Treatment, opt => opt.MapFrom(src => src.schedulerDate.treatment.Title))
+                       .ForMember(dest => dest.ScheduleDate, opt => opt.MapFrom(src => src.schedulerDate.dateFrom))
+                       .ReverseMap()
+                       .ForMember(dest => dest.schedulerDate, opt => opt.Ignore());
         }
     }
 }

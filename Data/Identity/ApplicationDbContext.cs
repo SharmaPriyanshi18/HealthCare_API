@@ -1,4 +1,5 @@
-﻿using HealthCareData;
+﻿using HealthCare_Data.Identity;
+using HealthCareData;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,9 +21,12 @@ namespace HealthCareData.Identity
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Therapist> Therapists { get; set; }
         public DbSet<Case> Cases { get; set; }
+        public DbSet<treatment> treatments { get; set; }
         public DbSet<Disease> Diseases { get; set; }
         public DbSet<ImageProfile> ImageProfiles { get; set; }
         public DbSet<schedulerDate> schedulers { get; set; }
         public DbSet<SchedulerTherapist> schedulerTherapists { get; set; }
+        public DbSet<Assessment> Assessments { get; set; }
+
     }
 }

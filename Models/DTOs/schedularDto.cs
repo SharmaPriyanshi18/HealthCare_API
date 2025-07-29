@@ -12,7 +12,7 @@ namespace HealthCareModels.Models.DTOs
         public int SchedulerId { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
-        public int CaseId { get; set; }
+        public int treatmentId { get; set; }
         public string Title { get; set; }
         public string ApplicationUserId { get; set; }
         public string UserName { get; set; }

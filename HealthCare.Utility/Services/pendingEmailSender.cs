@@ -30,15 +30,15 @@ namespace HealthCareRepositorys.Repository
             var schedulerRepo = scope.ServiceProvider.GetRequiredService<IShedularRepository>();
             var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
 
-            var pendingSchedulers = await schedulerRepo.GetAllAsync("Disease.ApplicationUser");
+            var pendingSchedulers = await schedulerRepo.GetAllAsync("treatment.ApplicationUser");
 
             foreach (var scheduler in pendingSchedulers.Where(s => !s.IsEmailSent))
             {
-                var toEmail = scheduler.Disease?.ApplicationUser?.Email;
+                var toEmail = scheduler.treatment?.ApplicationUser?.Email;
                 if (string.IsNullOrWhiteSpace(toEmail)) continue;
 
-                var subject = $"Appointment Scheduled - Case #{scheduler.CaseId}";
-                var body = $"Dear {scheduler.Disease?.ApplicationUser?.UserName},\n\n" +
+                var subject = $"Appointment Scheduled - Case #{scheduler.treatmentId}";
+                var body = $"Dear {scheduler.treatment?.ApplicationUser?.UserName},\n\n" +
                            $"Your appointment is scheduled from {scheduler.dateFrom} to {scheduler.dateTo}.\n\nThank you.";
 
                 await emailSender.SendEmailAsync(toEmail, subject, body);

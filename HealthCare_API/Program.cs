@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Hangfire;
 using Hangfire.SqlServer;
 using HealthCareModels.MappingProfile;
+using HealthCareRepositorys.Repositorys.IRepository;
+using HealthCareRepositorys.Repositorys.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,9 +72,10 @@ builder.Services.AddScoped<ApplicationUserStore>();
 builder.Services.AddScoped<IPatientProfileRepository, PatientProfileRepository>();
 builder.Services.AddScoped<IUserServiceRepository, userServiceRepository>();
 builder.Services.AddScoped<ITherapistRepository, TherapistRepository>();
-builder.Services.AddScoped<ICaseRepository, CaseRepository>();
+builder.Services.AddScoped<ITreatmentRepository,TreatmentRepository>();
 builder.Services.AddScoped<IDiseaseRepository, DiseaseRepository>();
 builder.Services.AddScoped<IShedularRepository, ShedularRepository>();
+builder.Services.AddScoped<IAssessmentRepository,AssessmentRepository>();
 builder.Services.AddScoped<ISchedulerQueueService, SchedulerQueueService>();
 //builder.Services.AddHostedService<PendingEmailSender>();
 
@@ -164,61 +167,61 @@ var app = builder.Build();
 builder.Logging.AddConsole();
 
 // Seed Roles and Default Users
-//using (var scope = app.Services.CreateScope())
-//{
-//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-//    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-//    string[] roles = new[] { "Admin", "Patient" };
+    string[] roles = new[] { "Admin", "Patient" };
 
-//    foreach (var role in roles)
-//    {
-//        if (!await roleManager.RoleExistsAsync(role))
-//        {
-//            await roleManager.CreateAsync(new ApplicationRole { Name = role });
-//        }
-//    }
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new ApplicationRole { Name = role });
+        }
+    }
 
-//    // Create Admin user
-//    if (await userManager.FindByNameAsync("sacchu") == null)
-//    {
-//        var admin = new ApplicationUser
-//        {
-//            UserName = "sacchu",
-//            Email = "sachu@gmail.com",
-//            Address = "Admin Default Address",
-//            City = "Admin City",
-//            Country = "India",
-//            State = "Delhi",
-//            PostalCode = "110001"
-//        };
-//        var result = await userManager.CreateAsync(admin, "Admin123#");
-//        if (result.Succeeded)
-//        {
-//            await userManager.AddToRoleAsync(admin, "Admin");
-//        }
-//    }
+    // Create Admin user
+    if (await userManager.FindByNameAsync("sacchu") == null)
+    {
+        var admin = new ApplicationUser
+        {
+            UserName = "sacchu",
+            Email = "sachu@gmail.com",
+            Address = "Admin Default Address",
+            City = "Admin City",
+            Country = "India",
+            State = "Delhi",
+            PostalCode = "110001"
+        };
+        var result = await userManager.CreateAsync(admin, "Admin123#");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(admin, "Admin");
+        }
+    }
 
-//    // Create Patient 
-//    if (await userManager.FindByNameAsync("priyanshi") == null)
-//    {
-//        var user = new ApplicationUser
-//        {
-//            UserName = "priyanshi",
-//            Email = "priyanshi@gmail.com",
-//            Address = "Patient Default Address",
-//            City = "Patient City",
-//            Country = "India",
-//            State = "Madhya Pradesh",
-//            PostalCode = "482002"
-//        };
-//        var result = await userManager.CreateAsync(user, "Users123#");
-//        if (result.Succeeded)
-//        {
-//            await userManager.AddToRoleAsync(user, "Patient");
-//        }
-//    }
-//}
+    // Create Patient 
+    if (await userManager.FindByNameAsync("priyanshi") == null)
+    {
+        var user = new ApplicationUser
+        {
+            UserName = "priyanshi",
+            Email = "priyanshi@gmail.com",
+            Address = "Patient Default Address",
+            City = "Patient City",
+            Country = "India",
+            State = "Madhya Pradesh",
+            PostalCode = "482002"
+        };
+        var result = await userManager.CreateAsync(user, "Users123#");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Patient");
+        }
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

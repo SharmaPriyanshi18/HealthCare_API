@@ -1,4 +1,5 @@
-﻿using HealthCareData.Identity;
+﻿using HealthCare_Data.Identity;
+using HealthCareData.Identity;
 using HealthCareModels.Models.DTOs;
 using HealthCareRepositorys.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace HealthCare_API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var schedulerDtos = await _context.schedulers
-                .Include(s => s.Disease)
+                .Include(s => s.treatment)
                     .ThenInclude(d => d.ApplicationUser)
                 .Include(s => s.SchedulerTherapists)
                     .ThenInclude(st => st.Therapist)
@@ -40,13 +41,13 @@ namespace HealthCare_API.Controllers
                     SchedulerId = s.schedulerId,
                     DateFrom = s.dateFrom,
                     DateTo = s.dateTo,
-                    CaseId = s.CaseId,
-                    Title = s.Disease.Title,
-                    ApplicationUserId = s.Disease.ApplicationUserId,
-                    UserName = s.Disease.ApplicationUser.UserName,
-                    address = s.Disease.ApplicationUser.Address,
-                    phonenumber = s.Disease.ApplicationUser.PhoneNumber,
-                    email = s.Disease.ApplicationUser.Email,
+                    treatmentId = s.treatmentId,
+                    Title = s.treatment.Title,
+                    ApplicationUserId = s.treatment.ApplicationUserId,
+                    UserName = s.treatment.ApplicationUser.UserName,
+                    address = s.treatment.ApplicationUser.Address,
+                    phonenumber = s.treatment.ApplicationUser.PhoneNumber,
+                    email = s.treatment.ApplicationUser.Email,
                     TherapistIds = string.Join(",", s.SchedulerTherapists.Select(st => st.TherapistId)),
                     TherapistNames = string.Join(", ", s.SchedulerTherapists.Select(st => st.Therapist.Name))
                 })
@@ -63,21 +64,21 @@ namespace HealthCare_API.Controllers
 
             var therapistIdList = dto.TherapistIds.Split(',').Select(int.Parse).ToList();
 
-            var disease = await _context.Diseases
+            var treatment = await _context.treatments
                 .Include(d => d.ApplicationUser)
-                .FirstOrDefaultAsync(d => d.CaseId == dto.CaseId);
+                .FirstOrDefaultAsync(d => d.treatmentId == dto.treatmentId);
 
-            if (disease == null)
+            if (treatment == null)
                 return BadRequest("Invalid CaseId.");
 
-            disease.TherapistId = therapistIdList.First(); 
+            treatment.TherapistId = therapistIdList.First(); 
 
             var scheduler = new schedulerDate
             {
                 dateFrom = dto.DateFrom,
                 dateTo = dto.DateTo,
-                CaseId = dto.CaseId,
-                Disease = disease,
+                treatmentId = dto.treatmentId,
+                treatment = treatment,
                 SchedulerTherapists = therapistIdList.Select(tid => new SchedulerTherapist
                 {
                     TherapistId = tid
@@ -105,7 +106,7 @@ namespace HealthCare_API.Controllers
 
             scheduler.dateFrom = dto.DateFrom;
             scheduler.dateTo = dto.DateTo;
-            scheduler.CaseId = dto.CaseId;
+            scheduler.treatmentId = dto.treatmentId;
 
             var therapistIdList = dto.TherapistIds.Split(',').Select(int.Parse).ToList();
 
